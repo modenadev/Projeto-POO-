@@ -1,210 +1,221 @@
-📘 1. Introdução
+📦 Sistema de Gerenciamento de Pedidos com Mensageria
 
-Este projeto implementa um sistema de mensageria utilizando Spring Boot, RabbitMQ e Spring AMQP.
-Ele foi desenvolvido como parte do plano de duas semanas para consolidar conhecimentos de:
+Um sistema robusto para processamento assíncrono de pedidos e notificações utilizando arquitetura orientada a eventos.
 
-Programação Orientada a Objetos
+📑 Índice
 
-Arquitetura MVC
+Sobre o Projeto
 
-Spring Data JPA
+Arquitetura da Solução
 
-APIs REST
+Tecnologias Utilizadas
 
-Mensageria e comunicação assíncrona
+Pré-requisitos e Instalação
 
-RabbitMQ
+Como Executar
 
-Boas práticas de desenvolvimento
+Documentação da API
 
-⚙️ 2. Objetivo Geral do Projeto
+Resultados e Aprendizados
 
-Criar um sistema funcional que utilize mensageria para processar pedidos e gerar notificações, mostrando domínio de:
+📖 Sobre o Projeto
 
-✔ Envio e consumo de mensagens em filas RabbitMQ
-✔ Comunicação assíncrona
-✔ Integração entre camadas (Controller → Service → Repository → Messaging)
-✔ Persistência com JPA
-✔ Exposição de APIs RESTful
+Este projeto foi desenvolvido para consolidar conhecimentos avançados em Programação Orientada a Objetos e Arquitetura de Software. O objetivo central é demonstrar a aplicação prática de mensageria assíncrona para desacoplar serviços críticos.
 
-🧰 3. Tecnologias Utilizadas
+O sistema simula um e-commerce onde a criação de um pedido dispara automaticamente um processo de notificação, sem bloquear a resposta ao usuário final, garantindo maior performance e escalabilidade.
+
+Objetivos Específicos
+
+✔️ Implementar comunicação assíncrona com RabbitMQ.
+
+✔️ Demonstrar o padrão Producer-Consumer.
+
+✔️ Aplicar arquitetura em camadas (MVC).
+
+✔️ Persistir dados relacionalmente com Spring Data JPA.
+
+🏗 Arquitetura da Solução
+
+O sistema segue uma arquitetura baseada em microsserviços lógicos, onde o fluxo de dados é gerenciado através de filas.
+
+Fluxo de Mensageria
+
+sequenceDiagram
+    participant Cliente
+    participant PedidoService
+    participant RabbitMQ
+    participant Consumer
+    participant BancoDados
+
+    Cliente->>PedidoService: POST /pedidos (Cria Pedido)
+    PedidoService->>BancoDados: Salva Pedido (Status: Pendente)
+    PedidoService->>RabbitMQ: Envia Mensagem (PedidoMessageDTO)
+    RabbitMQ-->>PedidoService: Ack
+    PedidoService-->>Cliente: 201 Created (Imediato)
+    
+    loop Processamento Assíncrono
+        RabbitMQ->>Consumer: Entrega Mensagem
+        Consumer->>BancoDados: Gera Notificação
+        Consumer->>BancoDados: Atualiza Status Pedido
+    end
+
+
+Estrutura de Pacotes
+
+src/main/java/com/example/mensageria
+
+├── config          # Configurações do RabbitMQ (Exchanges, Queues)
+
+├── controller      # Endpoints REST
+
+├── dto             # Objetos de Transferência de Dados (Records/Class)
+
+├── entity          # Entidades JPA (Banco de Dados)
+
+├── messaging       # Producers e Consumers
+
+├── repository      # Interfaces Spring Data
+
+└── service         # Regras de Negócio
+
+
+
+🛠 Tecnologias Utilizadas
+
+Categoria
+
+Tecnologia
+
+Linguagem
 
 Java 17
 
-Spring Boot 3.3
+Framework
 
-Spring Web
+Spring Boot 3.3 (Web, Data JPA, AMQP)
 
-Spring Data JPA
+Mensageria
 
-H2 Database
+RabbitMQ 4.x (Protocolo AMQP)
 
-Spring AMQP (RabbitMQ)
+Banco de Dados
 
-RabbitMQ 4.x
+H2 Database (Em memória)
+
+Build Tool
 
 Maven
 
-VS Code
+IDE
 
-🏗️ 4. Arquitetura da Aplicação
-src/main/java/com/example/mensageria
- ├── config
- ├── controller
- ├── dto
- ├── entity
- ├── messaging
- ├── repository
- ├── service
- └── MensageriaApplication.java
+VS Code / IntelliJ IDEA
 
-Fluxo de Mensageria
-POST /pedidos
-         ↓
-PedidoService → PedidoProducer
-         ↓
-RabbitMQ Exchange → Queue
-         ↓
-PedidoConsumer
-         ↓
-Banco de Dados (Notificação gerada)
+📦 Pré-requisitos e Instalação
 
-📦 5. Guia de Instalação
-5.1 Pré-requisitos
+Antes de começar, certifique-se de ter o ambiente configurado:
 
-Java 17+
+1. Pré-requisitos
 
-Maven ou Maven Wrapper (./mvnw)
+Java JDK 17+
 
-RabbitMQ instalado
+RabbitMQ Server (Instalado localmente ou via Docker)
 
-VS Code ou IntelliJ
+Maven
 
-5.2 Instalando o RabbitMQ no Windows
+2. Configuração do RabbitMQ (Windows/Linux)
 
-Instalar Erlang OTP
+Se estiver usando Docker (Recomendado):
 
-Instalar RabbitMQ Server
+docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:4-management
 
-Ativar painel de administração:
+
+Instalação Manual (Windows):
+
+Instale o Erlang OTP.
+
+Instale o RabbitMQ Server.
+
+Ative o painel de gestão:
 
 rabbitmq-plugins.bat enable rabbitmq_management
 
 
-Rodar o servidor:
+Inicie o servidor:
 
 rabbitmq-server.bat
 
 
-Acessar painel:
+Acesso: http://localhost:15672 (User: guest / Pass: guest)
 
-http://localhost:15672
+▶️ Como Executar
+
+Clone o repositório:
+
+git clone [https://github.com/seu-usuario/projeto-mensageria.git](https://github.com/seu-usuario/projeto-mensageria.git)
 
 
-(guest / guest)
+Navegue até a pasta do projeto e instale as dependências:
 
-▶️ 6. Como Rodar o Projeto
-6.1 Rodar o back-end
+./mvnw clean install
 
-No terminal:
+
+Execute a aplicação:
 
 ./mvnw spring-boot:run
 
 
-Ou clique em Run na classe MensageriaApplication.java.
+O servidor iniciará em http://localhost:8080.
 
-O servidor sobe em:
+🧪 Documentação da API
 
-http://localhost:8080
+1. Criar Novo Pedido
 
-🧪 7. Guia de Uso (Testes da API)
-Criar Pedido
+Envia um pedido para processamento e dispara a mensagem para a fila.
 
-POST /pedidos
+URL: /pedidos
+
+Método: POST
+
+Body:
 
 {
   "clienteNome": "Ruan",
-  "valorTotal": 120.00
+  "valorTotal": 120.50
 }
 
-Listar Pedidos
 
-GET /pedidos
+2. Listar Pedidos
 
-Listar Notificações
+Retorna todos os pedidos cadastrados.
 
-GET /notificacoes
+URL: /pedidos
 
-Como funciona:
+Método: GET
 
-Você envia um pedido
+3. Listar Notificações
 
-Ele é salvo no banco
+Verifica as notificações geradas pelo consumidor após o processamento da fila.
 
-Uma mensagem é enviada ao RabbitMQ
+URL: /notificacoes
 
-O Consumer processa a mensagem
+Método: GET
 
-Uma notificação é criada automaticamente
+🧠 Resultados e Aprendizados
 
-📊 8. Resultados Obtidos
+Principais Conquistas
 
-Sistema funcionando completamente
+Configuração completa de Exchange, Queue e Binding no Spring Boot.
 
-Fluxo de mensageria enviando e recebendo mensagens
+Implementação bem-sucedida de DTOs para tráfego seguro de dados.
 
-RabbitMQ configurado com Exchange, Queue e Binding
+Diagnóstico e resolução de conflitos de portas e injeção de dependências.
 
-APIs REST estáveis
+Desafios Superados
 
-Banco H2 acessível via /h2-console
+⚠️ Configuração de Pacotes: Inicialmente, as filas não eram criadas devido ao escaneamento incorreto dos pacotes pelo Spring. Solucionado reorganizando a estrutura de diretórios.
 
-Documentação e README completos
+⚠️ Conexão AMQP: Ajustes finos foram necessários no application.yml para garantir a conexão estável com o RabbitMQ.
 
-🧠 9. Principais Aprendizados
+🤝 Contribuição
 
-Como configurar e integrar RabbitMQ com Spring Boot
-
-Diferença entre comunicação síncrona e assíncrona
-
-Boas práticas de arquitetura em camadas
-
-Criação de DTOs e uso de JPA
-
-Injeção de dependência com Spring
-
-Observação do comportamento real de filas
-
-Diagnóstico de problemas (portas, configs, pacotes, beans)
-
-⚠️ 10. Desafios Encontrados
-
-Conflitos de porta com RabbitMQ
-
-Problemas com configuração de pacotes (package)
-
-Ajustes no application.yml para reconhecer propriedades
-
-Falha ao iniciar a aplicação por placeholders não encontrados
-
-Filas não sendo criadas por causa de pacotes fora do scan do Spring
-
-(Esses desafios foram resolvidos durante o desenvolvimento.)
-
-✔️ 11. Conclusão
-
-O projeto demonstra domínio prático de:
-
-Mensageria com RabbitMQ
-
-Spring Boot + AMQP
-
-Arquitetura limpa
-
-API REST
-
-Persistência com H2
-
-Comunicação assíncrona
-
-É um exemplo sólido para portfólio, apresentações e aprendizado.
+Este projeto é de cunho educacional. Sugestões e pull requests são bem-vindos!
