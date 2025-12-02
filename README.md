@@ -82,12 +82,6 @@ src/main/java/com/example/mensageria
 
 🛠 Tecnologias Utilizadas
 
-Categoria
-
-Tecnologia
-
-Linguagem
-
 Java 17
 
 Framework
@@ -219,3 +213,4 @@ Desafios Superados
 🤝 Contribuição
 
 Este projeto é de cunho educacional. Sugestões e pull requests são bem-vindos!
+
