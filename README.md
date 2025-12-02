@@ -82,7 +82,7 @@ src/main/java/com/example/mensageria
 
 🛠 Tecnologias Utilizadas
 
-Java 17
+Java 21
 
 Framework
 
